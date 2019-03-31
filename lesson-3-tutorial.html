@@ -1,0 +1,210 @@
+<div id="container"></div>
+<div>
+	<button id="random-button">Randomize</button>
+	<button id="toggle-button">Toggle</button>
+</div>
+
+<div>
+	<button class="random-button-group" data-name="a">A</button>
+	<button class="random-button-group" data-name="b">B</button>
+	<button class="random-button-group" data-name="c">C</button>
+</div>
+
+<script>
+	
+	// ----------------------------------------------------
+	// Make some random data
+	
+	const data = []
+	for (let i = 0; i < 100; i += 1) {
+		const a = Math.random()
+		const b = Math.random()
+		const c = Math.random()
+		data.push({ a, b, c })
+	}
+	
+	// This makes an array of objects with three properties that each random numbers from 0 to 1
+	
+	
+	// ---------------------------------------------------
+	// Configure the container
+
+	const container = document.getElementById('container')
+	container.style.width = '600px'
+	container.style.height = '400px'
+	container.style.border = '1px solid'
+	container.style.borderRadius = '10px'
+	container.style.position = 'relative'
+	// Makes a box with a border
+	
+	const body = document.querySelector('body')
+	body.style.display = 'flex'
+	body.style.justifyContent = 'center'
+	body.style.alignItems = 'center'
+	body.style.flexDirection = 'column'
+	// Centers all children of the body tag
+	
+	
+	// -----------------------------------------------
+	// Make things elements to display
+	
+	const elements = [] // We need to track elements that are created so we can change their properties
+	
+	function makeThings() {
+		let step = 600 / data.length // divide the width of the container
+		let i = 0
+		// Loop through all data 
+		data.forEach((item) => {
+			const el = makeThing() // make an element
+			el.style.left = `${step * i}px`	// horizontal position 
+			el.style.top = `${item.a * 400}px` // vertical position 
+			i += 1
+			container.appendChild(el) // Add this to container
+			elements.push(el) // Save ref to element
+		})
+	}
+	// We made some elements that will be displayed in container
+	
+	// This is a helper function that creates an element 
+	// with common properties. 
+	function makeThing() {
+		const el = document.createElement('div')
+		el.style.width = '5px'
+		el.style.height = '5px'
+		el.style.backgroundColor = 'red'
+		el.style.position = 'absolute'
+		el.style.transition = '400ms'
+		return el
+	}
+	
+	makeThings() // Make the things
+
+	// -------------------------------------------------
+	// Set up the button
+	
+	// This is a helper function that takes a state true/false
+	// and styles the button with either a white or black 
+	// background depending on state
+	function selectButton(button, state) {
+		button.style.border = '1px solid'
+		button.style.borderRadius = '5px'
+		button.style.margin = '5px'
+		button.style.padding = '5px 10px'
+		
+		if (state) {
+			button.style.backgroundColor = '#000'
+			button.style.color = '#fff'
+		} else {
+			button.style.backgroundColor = '#fff'
+			button.style.color = '#000'
+		}
+	}
+	
+	// Toggle button
+	// This helper function makes a toggle button
+	function makeToggleButton(button, callback) {
+		let buttonState = false
+		button.addEventListener('click', (e) => {
+			buttonState = !buttonState
+			selectButton(button, buttonState)
+			callback(buttonState)
+		})
+		selectButton(button, buttonState)
+	}
+	
+	// ---------------------------------------------------
+	// Make the buttons work 
+	
+	// get a reference to some buttons. 
+	// These will be toggle buttons
+	const randomButton = document.getElementById('random-button')
+	const toggleButton = document.getElementById('toggle-button')
+	
+	// Make a toggle button with randomButton 
+	makeToggleButton(randomButton, (state) => {
+		if (state) {
+			showField('b')
+		} else {
+			showField('a')
+		}
+	})
+	
+	// make a toggle button with toggleButton
+	makeToggleButton(toggleButton, (state) => {
+		let i = 0
+		const step = 360 / elements.length
+		elements.forEach((el) => {
+			const c = step * i
+			if (state) {
+				el.style.backgroundColor = `hsl(${c}, 50%, 50%)`
+			} else {
+				el.style.backgroundColor = 'red'
+			}
+			i += 1
+		}) 
+	})
+	
+	// This is a helper function that shows one field or another 
+	// from the data
+	function showField(field) {
+		let i = 0
+		elements.forEach((el) => {
+			// Changing this value moves the elements vertically
+			el.style.top = `${data[i][field] * 400}px`
+			el.style.height = '5px'
+			i += 1
+		}) 
+	}
+	
+	
+	// ------------------------------------------------
+	// Set up a group of buttons
+	
+	// Get a collection of button to make a group
+	const buttons = document.querySelectorAll('.random-button-group')
+	
+	
+	// Helper function that makes a group of buttons
+	// from a collection and callback
+	function makeGroup(buttons, callback) {
+		buttons.forEach((button) => {
+			selectButton(button, false)
+			button.addEventListener('click', (e) => {
+				buttons.forEach((b) => {
+					if (b === button) {
+						selectButton(b, true)
+					} else {
+						selectButton(b, false)
+					}
+				})
+				callback(button)
+			})
+		})
+	}
+	
+	
+	// Make a group of buttons. 
+	// The callback handles changing the data property 
+	// displayed by looking at the data-name attribute of the 
+	// the button that was clicked. 
+	makeGroup(buttons, (button) => {
+		let i = 0
+		elements.forEach((el) => {
+			const h = data[i][button.dataset.name] * 400
+			el.style.top = `${400 - h}px`
+			el.style.height = `${h}px`
+			i += 1
+		}) 
+	})
+	
+	
+</script>
+
+
+
+
+
+
+
+
+
