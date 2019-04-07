@@ -1,7 +1,7 @@
 <div id="container"></div>
 <div>
-	<button id="random-button">Randomize</button>
-	<button id="toggle-button">Toggle</button>
+	<button id="random-button">Show Field B</button>
+	<button id="toggle-button">Color</button>
 </div>
 
 <div>
@@ -123,8 +123,10 @@
 	// Make a toggle button with randomButton 
 	makeToggleButton(randomButton, (state) => {
 		if (state) {
+			randomButton.innerHTML = 'Show Field A'
 			showField('b')
 		} else {
+			randomButton.innerHTML = 'Show Field B'
 			showField('a')
 		}
 	})
@@ -136,8 +138,10 @@
 		elements.forEach((el) => {
 			const c = step * i
 			if (state) {
+				toggleButton.innerHTML = 'Mono'
 				el.style.backgroundColor = `hsl(${c}, 50%, 50%)`
 			} else {
+				toggleButton.innerHTML = 'Color'
 				el.style.backgroundColor = 'red'
 			}
 			i += 1

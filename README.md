@@ -9,8 +9,9 @@ This tutorial will cover a few the standard interactions that appear in many pro
 ## Objectives 
 
 1. Create IU systems that handle one or more choices
-1. Use closeures 
-1. Use callbacks
+1. Use closures 
+1. Use callbacks to handle interaction
+1. Use transition to create motion
 
 ## Buttons, Toggle Buttons and Button Groups 
 
@@ -32,7 +33,7 @@ You might handle interaction with this button like this:
 const helloButton = document.getElementById('hello-button')
 
 helloButton.addEventListener('click', (e) => {
-	// do stuff
+	// Rings bell
 }) 
 ```
 
@@ -46,15 +47,22 @@ You might make a toggle button like this:
 <button id="toggle-button">Mode</button>
 ```
 
-The code behind a toggle button is more complex. First, the state of the button needs to be expressed in the style of the button. Second, the button needs to execute different code depending on it's state. 
+Think of a toggle button like a light switch. The first time you interact it turns the light on, the next time it turns the light off. The code behind a toggle button is more complex. 
 
-You set up a toggle button like this: 
+First, the state of the button needs to be expressed in the style of the button. In other words when we look at a toggle button we need to know what state it's in. 
+
+Second, the button needs to execute different code depending on it's state. When alight is in the off state interaction turns the light on. 
+
+You migth set up a toggle button like this: 
 
 ```JavaScript 
+// Get a reference to the button
 const toggleButton = document.getElementById('toggle-button')
 
+// Define a variable to hold the state
 let buttonState = false
 
+// Define a function to handle the appearance
 function selectButton(button, state) {
 	button.style.border = '1px solid'
 	button.style.borderRadius = '5px'
@@ -70,11 +78,14 @@ function selectButton(button, state) {
 	}
 }
 
+// Set up the initial appearance
 selectButton(toggleButton, buttonState)
 
+// Define a function to handle clicks
 toggleButton.addEventListener('click', (e) => {
-	buttonState = !buttonState 
-	selectButton(toggleButton, buttonState)
+	buttonState = !buttonState // change the state
+	selectButton(toggleButton, buttonState) // change the appearnace
+	// do some other code...
 })
 ```
 
@@ -83,6 +94,8 @@ The code above is a good start it would be difficult to use if you had lots of t
 Consider this: 
 
 ```JavaScript
+// A funtion takes a button and a callback
+// The callback receives the button state as an argument
 function makeToggleButton(button, callback) {
 	let buttonState = false
 	button.addEventListener('click', (e) => {
@@ -92,7 +105,7 @@ function makeToggleButton(button, callback) {
 	})
 	selectButton(button, buttonState)
 }
-
+// Callback for the toogle button
 makeToggleButton(someButton, (state) => {
 	if (state) {
 		// do something when state is true
@@ -126,9 +139,9 @@ The goal here to create a group of buttons that work together. Essentially a tog
 
 Use this when you need to chose one of two or more options. For example, showing only passengers by class, or embarkation. 
 
-To make a group of buttons you'll need to have a collection of button elements. This will allow you to loop through the group and set the state of any or all buttons. 
+To make a group of buttons you'll need to have a collection of button elements. This will allow you to loop through the group and set the state of any or all buttons.
 
-An easy approach is to handle a click on any of the buttons in the group by looping through the group, 'deselecting' all of the buttons, and 'selecting' the button that clicked. 
+An easy approach is to handle a click on any of the buttons in the group by looping through the group, 'deselecting' all of the buttons, and 'selecting' the button that was clicked. 
 
 To get a collection of buttons give all of your buttons the same class name. 
 
@@ -143,6 +156,8 @@ To get a collection of buttons give all of your buttons the same class name.
 Here all buttons have the class name: `random-button-group`. 
 
 ```JavaScript 
+// This function takes a collection of elements and a callback
+// The callback receives the button that was clicked as an argument
 function makeGroup(buttons, callback) {
 	buttons.forEach((button) => {
 		selectButton(button, false)
@@ -162,19 +177,19 @@ function makeGroup(buttons, callback) {
 
 Here I used a function that takes a collection of button elements, and a callback. It loops thropugh all of the buttons in the collection and adds an event listener to each. The handler function for the event listener captures `buttons`, `button`, and `callback` variables via closure. 
 
-When a button is clicked the handler loops through the collection and compares each button from the collection with `button` which is the button that was clicked. If they match that button is selected, otherwise the button is deselected. 
+When a button is clicked the 'click' handler loops through the collection and compares each button from the collection with variable `button` which is the button that was clicked. If they match that button is selected, otherwise the button is deselected. 
 
 Last it calls the callback function and passes the currently selected button. 
 
 To handle the callback realize that all of the buttons in the group will call the same callback, and the callback will receive the button that was clicked as a parameter. 
 
-At this point you'll need some unique way for each button in a group to handle the callback. Keep in mind there is only one callback, clicking any button in the group calls the same callback, and callback receives the button as a parameter. 
+At this point you'll need some unique way for each button in a group to handle the callback. Keep in mind there is only one callback, clicking any button in the group calls the same callback.
 
 To assign unqiue data to each button element use a data attribute. 
 
 `<button class="random-button-group" data-name="a">A</button>`
 
-Here the data attaribute is `data-name`. These attributes are for developer specified information and aalways begin with `data-` followed by any name you decide. Like all attributes the value must be quoted. 
+Here the data attribute is `data-name`. These attributes are for developer specified information and always begin with `data-` followed by any name you decide. Like all attributes the value must be quoted. 
 
 To access a data attribute with JS use the `dataset` property. 
 
@@ -190,18 +205,21 @@ Then set up the group.
 
 ```JavaScript
 makeGroup(buttons, (button) => {
-	let i = 0
-	elements.forEach((el) => {
+	buttons.forEach((el, i) => {
 		const h = data[i][button.dataset.name] * 400
 		el.style.top = `${400 - h}px`
 		el.style.height = `${h}px`
-		i += 1
 	}) 
 })
 ```
 
+Here a collection of buttons is passed in, along with a callback that takes `button` as a parameter. The callback looks at each button in the collection and sets some properties based on the `data-name` property of the button that was clicked. 
 
+## Challenges 
 
+The code above is started in the direction of making a resuable system. It leaves a few things out. 
 
-
-
+- Name Space - The code above 'pollutes` global space with several function names. Better to put all of these under a single name space. 
+	- Challenge: Define a single global object that owns all of these functions. 
+- The styles are fixed - The styles for the selected and non-selected states are fixed.
+	- Challenge: Allow your system to set the style for buttons. An easy approach might be to use a class name, though this would require that those classes be defined somewhere. 
