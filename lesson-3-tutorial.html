@@ -1,13 +1,16 @@
 <div id="container"></div>
+
 <div>
 	<button id="random-button">Show Field B</button>
 	<button id="toggle-button">Color</button>
+	<button id="width-button">Width</button>
 </div>
 
 <div>
 	<button class="random-button-group" data-name="a">A</button>
 	<button class="random-button-group" data-name="b">B</button>
 	<button class="random-button-group" data-name="c">C</button>
+	<button class="random-button-group" data-name="d">d</button>
 </div>
 
 <script>
@@ -20,7 +23,8 @@
 		const a = Math.random()
 		const b = Math.random()
 		const c = Math.random()
-		data.push({ a, b, c })
+		const d = (a + b + c) / 3 
+		data.push({ a, b, c, d })
 	}
 	
 	// This makes an array of objects with three properties that each random numbers from 0 to 1
@@ -35,6 +39,7 @@
 	container.style.border = '1px solid'
 	container.style.borderRadius = '10px'
 	container.style.position = 'relative'
+	container.style.overflow = 'hidden'
 	// Makes a box with a border
 	
 	const body = document.querySelector('body')
@@ -50,19 +55,6 @@
 	
 	const elements = [] // We need to track elements that are created so we can change their properties
 	
-	function makeThings() {
-		let step = 600 / data.length // divide the width of the container
-		let i = 0
-		// Loop through all data 
-		data.forEach((item) => {
-			const el = makeThing() // make an element
-			el.style.left = `${step * i}px`	// horizontal position 
-			el.style.top = `${item.a * 400}px` // vertical position 
-			i += 1
-			container.appendChild(el) // Add this to container
-			elements.push(el) // Save ref to element
-		})
-	}
 	// We made some elements that will be displayed in container
 	
 	// This is a helper function that creates an element 
@@ -76,8 +68,49 @@
 		el.style.transition = '400ms'
 		return el
 	}
+
+	function makeThings() {
+		let step = 600 / data.length // divide the width of the container
+		let i = 0
+		// Loop through all data 
+		data.forEach((item) => {
+			const el = makeThing() // make an element
+			el.style.left = `${step * i}px`	// horizontal position 
+			el.style.top = `${item.a * 400}px` // vertical position 
+			i += 1
+			container.appendChild(el) // Add this to container
+			elements.push(el) // Save ref to element
+			// ************************************************
+			// Use Closure to get at fields in the data object. 
+			el.get = (field) => {
+				return item[field]
+			}
+			// Give each element a method to set it's height. 
+			// The method accesses the data through closure! 
+			// OG functions bind this
+			el.show = function(field) {
+				this.style.height = `${item[field] * 400}px`
+			}
+			// => functions do not!
+			el.wohs = (field) => {
+				el.style.width = `${item[field] * 400}px`
+			}
+			// ***********************************************
+		})
+	}
 	
 	makeThings() // Make the things
+
+	// ***************************************************
+	// After making things we can cal the functions 
+	console.log('**** Showing things ****')
+	elements.forEach((el) => {
+		// Get the value of the data item that was captured 
+		// when the el.get() method was created.
+		console.log(el.get('a'), el.get('b'), el.get('c'))
+		// el.show('a')
+		el.wohs('a')
+	})
 
 	// -------------------------------------------------
 	// Set up the button
@@ -119,7 +152,8 @@
 	// These will be toggle buttons
 	const randomButton = document.getElementById('random-button')
 	const toggleButton = document.getElementById('toggle-button')
-	
+	const widthButton = document.getElementById('width-button')
+
 	// Make a toggle button with randomButton 
 	makeToggleButton(randomButton, (state) => {
 		if (state) {
@@ -139,13 +173,19 @@
 			const c = step * i
 			if (state) {
 				toggleButton.innerHTML = 'Mono'
-				el.style.backgroundColor = `hsl(${c}, 50%, 50%)`
+				el.style.backgroundColor = `hsla(${c}, 50%, 50%, 0.25)`
 			} else {
 				toggleButton.innerHTML = 'Color'
 				el.style.backgroundColor = 'red'
 			}
 			i += 1
 		}) 
+	})
+
+	makeToggleButton(widthButton, (state) => {
+		elements.forEach((el) => {
+			el.wohs('a')
+		})
 	})
 	
 	// This is a helper function that shows one field or another 
@@ -159,6 +199,14 @@
 			i += 1
 		}) 
 	}
+
+	function clearElements() {
+		container.innerHTML = 'HELLO WORLD'
+		elements.forEach((el) => {
+			container.removeChild(el)
+		})
+	}
+
 	
 	
 	// ------------------------------------------------
@@ -200,6 +248,9 @@
 			i += 1
 		}) 
 	})
+
+
+
 	
 	
 </script>
