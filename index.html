@@ -1,0 +1,399 @@
+<html>
+  <head>
+    <title>Getting Started Data Viz</title>
+    <style>
+      body {
+        font-family: Helvetica;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .passengers {
+        
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      .main {
+        width: 800px;
+        margin: auto;
+      }
+
+      .content {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      button {
+        border: 1px solid;
+        background-color: white;
+        color: black;
+        border-radius: 5px;
+      }
+
+      .button-selected {
+        background-color: black;
+        color: white;
+      }
+
+      #overlay {
+        position: absolute;
+        border: 1px solid;
+        border-radius: 5px;
+        padding: 0.5em;
+      }
+
+      #overlay::first-line {
+        font-size: 1.25em;
+      }
+
+      #overlay span {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div class="main">
+      
+      <section>
+        <header>
+          <h1>Titanic</h1>
+          <p>A look at the Titanic passenger data.</p>
+        </header>
+    
+        <div id="passengers" class="content"></div>
+        <footer>
+          <div>
+            <button id="button-gender">Gender</button>
+            <button id="button-embarked">Embarked</button>
+            <button id="button-survived">Survived</button>
+  
+          </div>
+          <div>
+            <button id="button-sort-gender">Gender</button>
+            <button id="button-sort-survived">Survived</button>
+            <button id="button-sort-embarked">Embarked</button>
+            <button id="button-sort-fare">Fare</button>
+            <button id="button-sort-id">Passenger ID</button>
+          </div>
+        </footer>
+      </section>
+
+      <div id="overlay">
+        
+      </div>
+    </div>
+    
+
+    <script>
+
+      const body = document.querySelector('body')
+
+      body.addEventListener('click', (e) => {
+        console.log(e.target.dataset.index)
+
+        const index = e.target.dataset.index
+
+        if (index !== undefined) {
+          console.log(passengerData[index])
+          const { name, fare } = passengerData[index]
+          // overlay.innerHTML = ``
+          const el = document.createElement('div')
+          el.innerHTML = `${name}`
+          // append to DOM
+
+        }
+
+        // remove from el from DOM ???
+
+        // console.log(e)
+        // console.log(e.target)
+        // console.log(body)
+        // console.log(e.pageX, e.pageY)
+      })
+
+    let state = false
+
+    const bg = document.getElementById('button-gender')
+    bg.addEventListener( 'click', (e) => {
+      state = !state
+      if (state) {
+        e.target.style.backgroundColor = 'black'
+        e.target.style.color = 'white'
+        e.target.classList.add('button-active')
+        passengerData.forEach((p, i) => {
+          elements[i].style.backgroundColor = p.sex === 'male' ? 'red' : 'green'
+        })
+      } else {
+        e.target.style.backgroundColor = 'white'
+        e.target.style.color = 'black'
+        e.target.classList.remove('button-active')
+        passengerData.forEach((p, i) => {
+          elements[i].style.backgroundColor = 'black'
+        })
+      }
+    } )
+
+
+
+  
+  // --------------------------------------------------------------
+  // Get References 
+
+
+
+  const elements = []
+  const passengerData = []
+
+  // Get a reference to div#content
+  // This is where we will add dynamic elements
+  const passengers = document.getElementById('passengers')
+  const embarkation = document.getElementById('passengers')
+
+  const buttonGender = document.getElementById('button-gender')
+  const buttonEmbarked = document.getElementById('button-embarked')
+  const buttonSurvived = document.getElementById('button-survived')
+
+  const buttonSortGender = document.getElementById('button-sort-gender')
+  const buttonSortEmbarked = document.getElementById('button-sort-embarked')
+  const buttonSortSurvived = document.getElementById('button-sort-survived')
+  const buttonSortFare = document.getElementById('button-sort-fare')
+  const buttonSortId = document.getElementById('button-sort-id')
+
+  const overlay = document.getElementById('overlay')
+
+  // ---------------------------------------------------------------
+  // Handle interaction 
+
+  let showGender = false
+  let showEmbarked = false 
+  let showSurvived = false
+
+  // Challenges Show gender, survived, and embarked
+
+  // Handle button clicks 
+  buttonGender.addEventListener('click', (e) => {
+    showGender = !showGender
+    selectButton(e.target, showGender)
+    displayByGender()
+  })
+
+  buttonEmbarked.addEventListener('click', (e) => {
+    showEmbarked = !showEmbarked
+    selectButton(e.target, showEmbarked)
+    displayByEmbarked()
+  })
+
+  buttonSurvived.addEventListener('click', (e) => {
+    showSurvived = !showSurvived
+    selectButton(e.target, showSurvived)
+    displaySurvived()
+  })
+
+  function selectButton(button, state) {
+    if (state) {
+      button.classList.add('button-selected')
+    } else {
+      button.classList.remove('button-selected')
+    }
+  }
+
+  function displaySurvived() {
+    passengerData.forEach((obj, i) => {
+      const el = elements[i]
+      if (showSurvived) {
+        el.style.borderRadius = obj.survived === 'No' ? '50%' : '0'
+      } else {
+        el.style.borderRadius = 0
+      }
+    })
+  }
+
+function displayByGender() {
+  passengerData.forEach((obj, i) => {
+    const el = elements[i]
+    const color = obj.sex === 'male' ? 'blue' : 'pink'
+    el.style.backgroundColor = showGender ? color : 'black'
+  })
+}
+
+  function displayByEmbarked() {
+    passengerData.forEach((obj, i) => {
+      const el = elements[i]
+      let color = 'black'
+      switch(obj.embarked) {
+        case 'C':
+          color = 'orange'
+          break
+        case 'Q': 
+          color = 'cyan'
+          break
+        case 'S':
+          color = 'magenta'
+          break
+        default: 
+          color = 'red'
+      } 
+
+      if (showEmbarked) {
+        el.style.border = `${color} solid 2px`
+      } else {
+        el.style.border = 'none'
+      }
+    })
+  }
+
+  // ----------------------------------------
+  // Stretch challenges 
+
+  // Sort on gender
+  buttonSortGender.addEventListener('click', (e) => {
+    passengerData.sort((a, b) => {
+      return a.sex === 'male' ? -1 : 1
+    })
+
+    displayByGender()
+    displayByEmbarked()
+    displaySurvived()
+
+    sortButtons(e.target)
+  })
+
+  // Sort on embarked
+  buttonSortEmbarked.addEventListener('click', (e) => {
+    passengerData.sort((a, b) => {
+      const x = a.embarked !== undefined ? a.embarked.charCodeAt(0) : 0
+      const y = b.embarked !== undefined ? b.embarked.charCodeAt(0) : 0
+      return x - y
+    })
+
+    displayByGender()
+    displayByEmbarked()
+    displaySurvived()
+    
+    sortButtons(e.target)
+  })
+
+  // Sort on survived
+  buttonSortSurvived.addEventListener('click', (e) => {
+    passengerData.sort((a, b) => {
+      return a.survived === 'Yes' ? -1 : 1
+    })
+    displayByGender()
+    displayByEmbarked()
+    displaySurvived()
+    sortButtons(e.target)
+  })
+
+  // Sort on fare
+  buttonSortFare.addEventListener('click', (e) => {
+    passengerData.sort((a, b) => {
+      const x = a.fare !== undefined ? a.fare : 0
+      const y = b.fare !== undefined ? b.fare : 0
+      return y - x
+    })
+    displayByGender()
+    displayByEmbarked()
+    displaySurvived()
+    sortButtons(e.target)
+  })
+
+  buttonSortId.addEventListener('click', (e) => {
+    sortButtons(e.target)
+    passengerData.sort((a, b) => {
+      console.log(a.passengerid - b.passengerid)
+      return a.passengerid - b.passengerid
+    })
+
+    displayByGender()
+    displayByEmbarked()
+    displaySurvived()
+  })
+
+  function sortButtons(button) {
+    [buttonSortId, buttonSortSurvived, buttonSortEmbarked, buttonSortGender, buttonSortFare].forEach((button) => {
+      button.classList.remove('button-selected')
+    })
+    button.classList.add('button-selected')
+  }
+
+  // ----------------------------------------------------
+  // Show and overlay
+
+  function showOverlay(index) {
+    const { name, fare, age, embarked, survived, sex } = passengerData[index]
+    overlay.style.display = 'block'
+    overlay.innerHTML = `
+
+    <div>${name}</div>
+    <div><span>Age:</span> ${age} ${sex}</div>
+    <div><span>Fare:</span> ${fare}</div>
+    <div><span>Embarked at:</span> ${embarked}</div>
+    <div><span>Survived:</span> ${survived}</div>
+    `
+  }
+
+  function hideOverlay() {
+    overlay.style.display = 'none'
+  }
+
+  hideOverlay()
+
+  passengers.addEventListener('mouseover', (e) => {
+    const index = e.target.dataset.index
+    if (index !== undefined) {
+      showOverlay(index)
+    }
+  })
+
+  passengers.addEventListener('mouseout', (e) => {
+    hideOverlay()
+  })
+
+
+
+  // ----------------------------------------------------
+  // Fetch Data 
+
+  fetch('titanic-passengers.json')
+    .then(res => res.json())
+    .then(json => handleData(json))
+    .catch(err => console.log(err.message))
+  
+  function handleData(data) {
+    // Get an array of relevant objects from the data
+    const fields = data.map(({ fields }) => fields)
+
+    // make a DOM element for each passenger
+fields.forEach((passenger, i) => {
+  // Put all of this data in the array above
+  // Might be good to find undefineds and other problems and fix them here.
+
+  // Make an element
+  const el = document.createElement('div')
+  // Attach the element to the dom
+  passengers.appendChild(el)
+  
+  elements.push(el)
+  passengerData.push(passenger)
+
+  // Style the element
+  el.style.width = '14px'
+  el.style.height = '14px'
+  el.style.backgroundColor = 'black'
+  el.style.margin = '1px'
+  el.style.transition = '200ms'
+  el.style.boxSizing = 'border-box'
+
+  el.dataset.index = i // <div data-index="i" data-myatt="hello">
+  el.dataset.myatt = 'Hello'
+
+    });
+  }
+
+    </script>
+  </body>
+</html>

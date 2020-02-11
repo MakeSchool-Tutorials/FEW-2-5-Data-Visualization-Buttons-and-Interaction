@@ -1,0 +1,95 @@
+<!doctype html>
+<html>
+	<head>
+		<title></title>
+		<style>
+			#titanic {
+				border: 1px solid;
+				width: 1000px;
+				height: 600px;
+				margin: auto;
+				position: relative;
+			}
+
+			#titanic > div {
+				transition: 200ms;
+			}
+		</style>
+	</head>
+	<body>
+
+
+		<div id="titanic"></div>
+		
+		<button id="show-gender">Gender</button>
+		<button id="show-age">Gender</button>
+		<button id="show-fare">Gender</button>
+		
+
+<script>
+		
+// Load data
+fetch('titanic-passengers.json')
+	.then(res => res.json())
+	.then(json => handleData(json))
+	.catch(err => console.log(err.message))
+
+
+
+
+
+
+// Handle data 
+function handleData(data) {
+	const fields = data.map(obj => obj.fields)
+	const titanicDiv = document.getElementById('titanic')
+	
+	// Find the max and min
+	const maxAge = Math.max(...fields.map(p => p.age !== undefined ? p.age : 0))
+	const minAge = Math.min(...fields.map(p => p.age !== undefined ? p.age : 0))
+
+	const maxFare = Math.max(...fields.map(p => p.fare !== undefined ? p.fare : 0))
+	const minFare = Math.min(...fields.map(p => p.fare !== undefined ? p.fare : 0))
+
+	// Store elements and data here
+	const titanicObjs = []
+
+	// Set up elements and object data
+	fields.forEach((passenger, i) => {
+		const el = document.createElement('div')
+		
+		el.style.backgroundColor = 'black'
+		el.style.width = `${900 / fields.length}px`
+		el.style.position = 'absolute'
+		el.style.bottom = 0
+		el.style.left = `${i * 1000 / fields.length}px`
+
+		titanicDiv.appendChild(el)
+		const obj = {
+			el, 
+			...passenger
+		}
+		titanicObjs.push(obj)
+	})
+
+	function showAges() {
+		titanicObjs.forEach(obj => {
+			obj.el.style.height = `${obj.age / maxAge * 100}%` 
+		})
+	}
+
+	showAges()
+
+	document.getElementById('show-gender').addEventListener('click', (e) => {
+		titanicObjs.forEach((obj) => {
+			const { el, sex } = obj
+			el.style.backgroundColor = sex === 'male' ? 'blue' : 'pink'
+		})
+	})
+
+
+}
+
+		</script>
+	</body>
+</html>
